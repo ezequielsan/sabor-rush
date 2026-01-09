@@ -1,0 +1,182 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 1. USUÁRIOS E PERFIS [RF11]
+model Usuario {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senhaHash String
+  perfil    Perfil   @default(GARCOM)
+  criadoEm  DateTime @default(now())
+
+  fechamentos    FechamentoCaixa[]
+  movimentacoes  MovimentacaoEstoque[]
+}
+
+enum Perfil {
+  ADMIN
+  GARCOM
+  CAIXA
+  COZINHA
+}
+
+// 2. CLIENTES [RF01, RF08]
+model Cliente {
+  id        String   @id @default(uuid())
+  nome      String
+  telefone  String?  @unique
+  pedidos   Pedido[]
+}
+
+// 3. PRODUTOS E ESTOQUE [RF02, RF09, RF12]
+model Produto {
+  id          String   @id @default(uuid())
+  nome        String
+  preco       Float
+  descricao   String?
+  categoria   String
+  imagemUrl   String?
+  ativo       Boolean @default(true)
+  
+  // Controle de Estoque
+  temEstoqueControlado Boolean @default(false)
+  quantidadeEstoque    Int     @default(0)
+  minimoEstoque        Int     @default(5) // [RF05] Alerta de mínimo
+  
+  itensPedido   ItemPedido[]
+  movimentacoes MovimentacaoEstoque[]
+}
+
+// [RF12] Log de auditoria de estoque
+model MovimentacaoEstoque {
+  id          String   @id @default(uuid())
+  data        DateTime @default(now())
+  tipo        TipoMovimentacao
+  quantidade  Int
+  justificativa String
+  
+  produtoId   String
+  produto     Produto @relation(fields: [produtoId], references: [id])
+  usuarioId   String
+  usuario     Usuario @relation(fields: [usuarioId], references: [id])
+}
+
+enum TipoMovimentacao {
+  ENTRADA_COMPRA
+  SAIDA_VENDA
+  AJUSTE_PERDA
+  AJUSTE_CORRECAO
+}
+
+// 4. MESAS [RF14]
+model Mesa {
+  id       String @id @default(uuid())
+  numero   Int    @unique
+  status   StatusMesa @default(LIVRE)
+  pedidos  Pedido[]
+}
+
+enum StatusMesa {
+  LIVRE
+  OCUPADA
+  PAGAMENTO_PENDENTE
+}
+
+// 5. CUPONS [RF15]
+model Cupom {
+  id        String   @id @default(uuid())
+  codigo    String   @unique
+  descontoPercentual Float?
+  descontoFixo       Float?
+  ativo     Boolean  @default(true)
+  usos      Int      @default(0)
+  
+  pedidos   Pedido[]
+}
+
+// 6. PEDIDOS [RF03, RF04, RF10]
+model Pedido {
+  id          String      @id @default(uuid())
+  dataCriacao DateTime    @default(now())
+  status      StatusPedido @default(RECEBIDO)
+  
+  mesaId      String
+  mesa        Mesa        @relation(fields: [mesaId], references: [id])
+  
+  clienteId   String?
+  cliente     Cliente?    @relation(fields: [clienteId], references: [id])
+  
+  itens       ItemPedido[]
+  
+  // Financeiro
+  subtotal    Float       @default(0) // Soma dos itens
+  taxaServico Float       @default(0) // [RF10]
+  desconto    Float       @default(0) // [RF10]
+  totalFinal  Float       @default(0) // Subtotal + Taxa - Desconto
+  
+  cupomId     String?
+  cupom       Cupom?      @relation(fields: [cupomId], references: [id])
+
+  pagamento   Pagamento?
+}
+
+enum StatusPedido {
+  RECEBIDO
+  EM_PREPARO
+  PRONTO
+  ENTREGUE
+  CANCELADO
+  FINALIZADO
+}
+
+model ItemPedido {
+  id          String  @id @default(uuid())
+  quantidade  Int
+  observacao  String? // [RF13] Opcionais simples
+  precoNaHora Float
+  
+  pedidoId    String
+  pedido      Pedido  @relation(fields: [pedidoId], references: [id])
+  produtoId   String
+  produto     Produto @relation(fields: [produtoId], references: [id])
+}
+
+// 7. PAGAMENTO E CAIXA [RF07]
+model Pagamento {
+  id              String   @id @default(uuid())
+  pedidoId        String   @unique
+  pedido          Pedido   @relation(fields: [pedidoId], references: [id])
+  
+  formaPagamento  MetodoPagamento
+  valorPago       Float
+  dataPagamento   DateTime @default(now())
+}
+
+enum MetodoPagamento {
+  DINHEIRO
+  PIX
+  CARTAO_CREDITO
+  CARTAO_DEBITO
+}
+
+model FechamentoCaixa {
+  id            String   @id @default(uuid())
+  dataFechamento DateTime @default(now())
+  
+  valorTotalEsperado Float
+  valorTotalReal     Float
+  diferenca          Float
+  justificativa      String? 
+  
+  usuarioId     String
+  usuario       Usuario @relation(fields: [usuarioId], references: [id])
+}
