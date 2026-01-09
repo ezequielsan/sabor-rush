@@ -1,5 +1,5 @@
 'use server'
-import { prisma } from './produtos'
+import { prisma } from '@/lib/prisma'
 
 // Registrar pagamento e finalizar o ciclo do pedido
 export async function registrarPagamento(pedidoId: string, metodo: 'DINHEIRO' | 'PIX' | 'CARTAO_CREDITO' | 'CARTAO_DEBITO', valorPago: number) {

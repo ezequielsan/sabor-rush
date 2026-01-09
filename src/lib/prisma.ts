@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 
-// Instância global do Prisma para evitar múltiplas conexões em desenvolvimento
+// Cria a conexão (Singleton pattern para não estourar conexões no desenvolvimento)
 const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
 export const prisma = globalForPrisma.prisma || new PrismaClient()

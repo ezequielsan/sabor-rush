@@ -1,5 +1,5 @@
 'use server'
-import { prisma } from './produtos'
+import { prisma } from '@/lib/prisma'
 
 // [RF01] Cadastrar Novo Cliente
 export async function cadastrarCliente(nome: string, telefone: string) {

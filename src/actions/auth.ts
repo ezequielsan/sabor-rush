@@ -1,16 +1,30 @@
 'use server'
 
-import { prisma } from './produtos'
+import { prisma } from '@/lib/prisma'
 import { cookies } from 'next/headers'
 
-// [RF11] Login Simples (Com Cookie de Sessão)
-export async function realizarLogin(email: string, senhaPlana: string) {
+// Agora a função aceita o 3º argumento: perfilSelecionado
+export async function realizarLogin(email: string, senhaPlana: string, perfilSelecionado: string) {
   try {
+    // 1. Verifica se foi enviado um perfil
+    if (!perfilSelecionado) {
+      return { sucesso: false, erro: "Selecione um perfil de acesso." }
+    }
+
     const usuario = await prisma.usuario.findUnique({ where: { email } })
     
     if (!usuario) return { sucesso: false, erro: "Usuário não encontrado." }
     
-    // Validação de senha (MVP)
+    // 2. [NOVO] Validação de Perfil
+    // Verifica se o perfil escolhido no botão bate com o do banco
+    if (usuario.perfil !== perfilSelecionado) {
+      return { 
+        sucesso: false, 
+        erro: `Este usuário não tem permissão de ${perfilSelecionado}.` 
+      }
+    }
+
+    // 3. Validação de senha (MVP)
     if (usuario.senhaHash !== senhaPlana) {
       return { sucesso: false, erro: "Senha incorreta." }
     }
@@ -22,7 +36,6 @@ export async function realizarLogin(email: string, senhaPlana: string) {
       perfil: usuario.perfil
     })
 
-    // CORREÇÃO: Adicionamos o 'await' antes de cookies()
     const cookieStore = await cookies()
     
     cookieStore.set('sabor-session', dadosSessao, {
@@ -41,9 +54,7 @@ export async function realizarLogin(email: string, senhaPlana: string) {
   }
 }
 
-// Função para sair do sistema
 export async function realizarLogout() {
-  // CORREÇÃO: Adicionamos o 'await' aqui também
   (await cookies()).delete('sabor-session')
   return { sucesso: true }
 }

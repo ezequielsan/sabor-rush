@@ -1,5 +1,5 @@
 'use server'
-import { prisma } from './produtos'
+import { prisma } from '@/lib/prisma'
 
 export async function realizarFechamentoCaixa(usuarioId: string, valorInformado: number, justificativa?: string) {
   // 1. Somar tudo que foi vendido desde o último fechamento

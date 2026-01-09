@@ -1,5 +1,5 @@
 'use server'
-import { prisma } from './produtos'
+import { prisma } from '@/lib/prisma'
 
 // [RF05] Relatório de Estoque Baixo
 export async function relatorioEstoqueBaixo() {

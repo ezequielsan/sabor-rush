@@ -1,5 +1,5 @@
 'use server'
-import { prisma } from './produtos'
+import { prisma } from '@/lib/prisma'
 
 export async function criarUsuario(nome: string, email: string, senhaPlana: string, perfil: 'ADMIN' | 'GARCOM' | 'COZINHA' | 'CAIXA') {
   try {

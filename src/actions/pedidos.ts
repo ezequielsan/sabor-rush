@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '../lib/prisma'
+import { prisma } from '@/lib/prisma'
 
 // --- 1. CRIAÇÃO DE PEDIDOS (GARÇOM) ---
 

@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from '../lib/prisma'
+import { prisma } from '@/lib/prisma' // <--- Importa do novo local
 
 // --- READ: Buscar Cardápio ---
 export async function buscarProdutos() {

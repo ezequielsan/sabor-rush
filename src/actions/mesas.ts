@@ -1,6 +1,6 @@
 'use server'
 
-import { prisma } from './produtos' // Reaproveitando a conexão
+import { prisma } from '@/lib/prisma'
 
 // --- READ: Listar Status das Mesas ---
 export async function listarMesas() {

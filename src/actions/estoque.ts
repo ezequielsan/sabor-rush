@@ -1,5 +1,5 @@
 'use server'
-import { prisma } from './produtos'
+import { prisma } from '@/lib/prisma'
 
 export async function ajusteManualEstoque(produtoId: string, qtd: number, tipo: 'ENTRADA_COMPRA' | 'AJUSTE_PERDA', justificativa: string, usuarioId: string) {
   try {
