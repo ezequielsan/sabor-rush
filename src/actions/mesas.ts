@@ -115,3 +115,84 @@ export async function unirMesas(idMesaOrigem: string, idMesaDestino: string) {
     return { sucesso: false, erro: e.message }
   }
 }
+
+// ... (mantenha os imports e funções anteriores)
+
+export async function buscarDadosDashboard() {
+  try {
+    // Busca mesas e inclui os pedidos que NÃO estão finalizados
+    const mesas = await prisma.mesa.findMany({
+      orderBy: { numero: 'asc' }, 
+      include: {
+        pedidos: {
+          where: {
+            status: { not: 'FINALIZADO' }
+          },
+          include: {
+            itens: true
+          }
+        }
+      }
+    })
+
+    // Processa os dados
+    const mesasFormatadas = mesas.map((mesa: any) => {
+      const pedidoAtual = mesa.pedidos[0]
+      
+      let total = 0
+      let itensCount = 0
+      let tempo = 'Livre'
+
+      if (pedidoAtual) {
+        total = pedidoAtual.totalFinal
+        itensCount = pedidoAtual.itens.length
+        
+        const diffMs = new Date().getTime() - new Date(pedidoAtual.dataCriacao).getTime()
+        const diffMins = Math.floor(diffMs / 60000)
+        
+        if (diffMins > 60) {
+            const horas = Math.floor(diffMins / 60)
+            const minutos = diffMins % 60
+            tempo = `${horas}h ${minutos}min`
+        } else {
+            tempo = `${diffMins}min`
+        }
+      }
+
+      return {
+        id: mesa.id,
+        codigo: mesa.numero, 
+        status: mesa.status,
+        nome: `Mesa ${mesa.numero}`, 
+        total,
+        itensCount,
+        tempo
+      }
+    })
+
+    // Cálculos dos Cards
+    const totalMesas = mesas.length
+    const ocupadas = mesas.filter(m => m.status === 'OCUPADA').length
+    const livres = mesas.filter(m => m.status === 'LIVRE').length
+    
+    // Soma o total
+    const faturamentoAberto = mesasFormatadas.reduce((acc: number, curr: any) => acc + curr.total, 0)
+
+    return {
+      sucesso: true,
+      dados: {
+        mesas: mesasFormatadas,
+        resumo: {
+          totalMesas,
+          ocupadas,
+          livres,
+          faturamentoAberto
+        }
+      }
+    }
+
+  } catch (error) {
+    console.error(error)
+    return { sucesso: false, erro: "Erro ao carregar dashboard" }
+  }
+}

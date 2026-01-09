@@ -37,11 +37,24 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // [ATUALIZADO] Passamos o perfilSelecionado como terceiro argumento
+      // Chamada ao Backend
       const resultado = await realizarLogin(email, senha, perfilSelecionado)
 
       if (resultado.sucesso) {
-        router.push('/dashboard')
+        // --- ROTEAMENTO INTELIGENTE POR PERFIL ---
+        const perfil = resultado.usuario?.perfil
+
+        if (perfil === 'CAIXA') {
+          router.push('/dashboard/caixa')
+        } 
+        else if (perfil === 'COZINHA') {
+          router.push('/dashboard/cozinha')
+        } 
+        else {
+          // ADMIN e GARÇOM vão para a visão geral das mesas
+          router.push('/dashboard')
+        }
+
         router.refresh()
       } else {
         setErro(resultado.erro || "Falha ao entrar.")
