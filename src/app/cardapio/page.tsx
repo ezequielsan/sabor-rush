@@ -16,9 +16,18 @@ type Adicional = {
     checked: boolean
 }
 
+type ItemCarrinho = {
+    nome: string
+    precoBase: number
+    adicionais: Adicional[]
+    quantidade: number
+}
+
 export default function CardapioPage() {
     const [modalAberto, setModalAberto] = useState(false)
     const [produtoSelecionado, setProdutoSelecionado] = useState<Produto | null>(null)
+    const [carrinho, setCarrinho] = useState<ItemCarrinho[]>([])
+
 
     const [adicionais, setAdicionais] = useState<Adicional[]>([
         { id: 1, nome: 'Bacon Extra', preco: 4.0, checked: false },
@@ -41,6 +50,44 @@ export default function CardapioPage() {
         )
     }
 
+    function adicionarAoPedido() {
+        if (!produtoSelecionado) return
+
+        const precoBase = parsePreco(produtoSelecionado.preco)
+        const adicionaisSelecionados = adicionais.filter((a) => a.checked)
+
+        setCarrinho((prev) => [
+            ...prev,
+            {
+                nome: produtoSelecionado.nome,
+                precoBase,
+                adicionais: adicionaisSelecionados,
+                quantidade: 1
+            }
+        ])
+
+        fecharModal()
+    }
+
+    function alterarQuantidade(nome: string, delta: number) {
+        setCarrinho((prev) =>
+            prev
+                .map((item) =>
+                    item.nome === nome
+                        ? { ...item, quantidade: item.quantidade + delta }
+                        : item
+                )
+                .filter((item) => item.quantidade > 0)
+        )
+    }
+
+    function calcularAdicionais(adicionais: Adicional[]) {
+        return adicionais
+            .filter((a) => a.checked)
+            .reduce((acc, a) => acc + a.preco, 0)
+    }
+
+
     function toggleAdicional(id: number) {
         setAdicionais((prev) =>
             prev.map((item) =>
@@ -48,6 +95,20 @@ export default function CardapioPage() {
             )
         )
     }
+
+    function parsePreco(preco: string) {
+        return Number(preco.replace('R$', '').replace(',', '.').trim())
+    }
+
+    const subtotal = carrinho.reduce((acc, item) => {
+        const totalAdicionais = calcularAdicionais(item.adicionais)
+        const precoUnitario = item.precoBase + totalAdicionais
+        return acc + precoUnitario * item.quantidade
+    }, 0)
+
+    const taxaServico = subtotal * 0.1
+    const total = subtotal + taxaServico
+
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -90,8 +151,8 @@ export default function CardapioPage() {
                             <button
                                 key={cat}
                                 className={`px-4 py-1 rounded-full text-sm ${cat === 'Todos'
-                                        ? 'bg-white border font-medium text-gray-700'
-                                        : 'bg-gray-200 text-gray-600'
+                                    ? 'bg-white border font-medium text-gray-700'
+                                    : 'bg-gray-200 text-gray-600'
                                     }`}
                             >
                                 {cat}
@@ -112,33 +173,77 @@ export default function CardapioPage() {
 
                 {/* RESUMO */}
                 <aside className="w-full max-w-sm bg-white border-l p-6 flex flex-col">
-                    <h2 className="text-lg text-gray-500 font-semibold mb-1">Resumo do Pedido</h2>
-                    <p className="text-sm text-gray-500 mb-4">0 Itens</p>
+                    <h2 className="text-lg text-gray-500 font-semibold mb-1">
+                        Resumo do Pedido
+                    </h2>
+                    <p className="text-sm text-gray-500 mb-4">
+                        {carrinho.length} Itens
+                    </p>
 
-                    <div className="flex-1 flex items-center justify-center text-gray-400">
-                        Carrinho vazio
+                    {/* LISTA */}
+                    <div className="flex-1 space-y-4 overflow-y-auto">
+                        {carrinho.length === 0 && (
+                            <div className="flex items-center justify-center text-gray-400 h-full">
+                                Carrinho vazio
+                            </div>
+                        )}
+
+                        {carrinho.map((item, index) => (
+                            <div
+                                key={index}
+                                className="border rounded-lg p-3 flex justify-between items-start"
+                            >
+                                <div>
+                                    <p className="font-medium text-gray-900">
+                                        {item.nome}
+                                    </p>
+
+                                    {/* 👇 AQUI ENTRA A PARTE DOS ADICIONAIS 👇 */}
+                                    {item.adicionais.length > 0 && (
+                                        <ul className="text-xs text-gray-400 mt-1">
+                                            {item.adicionais.map((a) => (
+                                                <li key={a.id}>
+                                                    + {a.nome} (R$ {a.preco.toFixed(2)})
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
+
+                                <p className="text-sm font-medium text-gray-900">
+                                    {(() => {
+                                        const totalAdicionais = calcularAdicionais(item.adicionais)
+                                        const precoUnitario = item.precoBase + totalAdicionais
+                                        return `R$ ${(precoUnitario * item.quantidade).toFixed(2)}`
+                                    })()}
+                                </p>
+                            </div>
+                        ))}
                     </div>
+
                     {/* TOTAIS */}
                     <div className="mt-6 space-y-2 text-sm">
                         <div className="flex justify-between text-gray-500">
                             <span>Subtotal:</span>
-                            <span>R$ 0,00</span>
+                            <span>R$ {subtotal.toFixed(2)}</span>
                         </div>
 
                         <div className="flex justify-between text-gray-500">
                             <span>Taxa de Serviço:</span>
-                            <span>R$ 0,00</span>
+                            <span>R$ {taxaServico.toFixed(2)}</span>
                         </div>
 
-                        <div className="flex justify-between font-semibold text-base text-gray-500">
+                        <div className="flex justify-between font-semibold text-base text-gray-700">
                             <span>Total:</span>
-                            <span>R$ 0,00</span>
+                            <span>R$ {total.toFixed(2)}</span>
                         </div>
                     </div>
+
                     <button className="mt-6 bg-orange-400 hover:bg-orange-500 text-white py-3 rounded-lg font-semibold">
                         Enviar para Produção
                     </button>
                 </aside>
+
             </main>
 
             {/* MODAL */}
@@ -212,7 +317,10 @@ export default function CardapioPage() {
                             >
                                 Cancelar
                             </button>
-                            <button className="bg-orange-400 hover:bg-orange-500 text-white px-4 py-2 rounded">
+                            <button
+                                onClick={adicionarAoPedido}
+                                className="bg-orange-400 hover:bg-orange-500 text-white px-4 py-2 rounded"
+                            >
                                 Adicionar ao Pedido
                             </button>
                         </div>
@@ -250,3 +358,4 @@ function ProdutoCard({
         </div>
     )
 }
+
