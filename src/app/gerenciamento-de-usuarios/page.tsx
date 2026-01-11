@@ -4,7 +4,26 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Eye, Edit, RefreshCcw, Trash2 } from 'lucide-react'
 
-function StatusCard({ label, count, colorClass }: { label: string, count: number, colorClass?: string }) {
+type Usuario = {
+    nome: string
+    email: string
+    perfil: string
+    perfilCor: string
+    status: string
+    statusCor: string
+    ultimoAcesso: string
+    criadoEm: string
+}
+
+function StatusCard({
+    label,
+    count,
+    colorClass,
+}: {
+    label: string
+    count: number
+    colorClass?: string
+}) {
     return (
         <div
             className={`w-full h-[216px] border rounded-lg px-6 py-4 flex flex-col items-center justify-center
@@ -14,91 +33,81 @@ function StatusCard({ label, count, colorClass }: { label: string, count: number
             <p className={`text-sm font-semibold mb-1 ${colorClass ? 'opacity-80' : ''}`}>
                 {label}
             </p>
-            <p className={`text-xl font-bold`}>
-                {count}
-            </p>
+            <p className="text-xl font-bold">{count}</p>
         </div>
     )
 }
 
-// Dados fixos de exemplo (podem vir de API)
+// Dados mock
 const usuariosMock = [
     {
-        nome: "Admin Sistema",
-        email: "admin@saborrush.com",
-        perfil: "Administrador",
-        perfilCor: "bg-purple-200 text-purple-800",
-        status: "Ativo",
-        statusCor: "bg-green-100 text-green-700",
-        ultimoAcesso: "18/11/2025",
-        criadoEm: "14/11/2024"
+        nome: 'Admin Sistema',
+        email: 'admin@saborrush.com',
+        perfil: 'Administrador',
+        perfilCor: 'bg-purple-200 text-purple-800',
+        status: 'Ativo',
+        statusCor: 'bg-green-100 text-green-700',
+        ultimoAcesso: '18/11/2025',
+        criadoEm: '14/11/2024',
     },
     {
-        nome: "João Silva",
-        email: "garcom@saborrush.com",
-        perfil: "Garçom/Vendas",
-        perfilCor: "bg-blue-200 text-blue-800",
-        status: "Ativo",
-        statusCor: "bg-green-100 text-green-700",
-        ultimoAcesso: "18/11/2025",
-        criadoEm: "19/11/2024"
+        nome: 'João Silva',
+        email: 'garcom@saborrush.com',
+        perfil: 'Garçom/Vendas',
+        perfilCor: 'bg-blue-200 text-blue-800',
+        status: 'Ativo',
+        statusCor: 'bg-green-100 text-green-700',
+        ultimoAcesso: '18/11/2025',
+        criadoEm: '19/11/2024',
     },
     {
-        nome: "Maria Santos",
-        email: "cozinha@saborrush.com",
-        perfil: "Cozinha",
-        perfilCor: "bg-orange-200 text-orange-800",
-        status: "Ativo",
-        statusCor: "bg-green-100 text-green-700",
-        ultimoAcesso: "18/11/2025",
-        criadoEm: "21/11/2024"
+        nome: 'Maria Santos',
+        email: 'cozinha@saborrush.com',
+        perfil: 'Cozinha',
+        perfilCor: 'bg-orange-200 text-orange-800',
+        status: 'Ativo',
+        statusCor: 'bg-green-100 text-green-700',
+        ultimoAcesso: '18/11/2025',
+        criadoEm: '21/11/2024',
     },
     {
-        nome: "Pedro Costa",
-        email: "caixa@saborrush.com",
-        perfil: "Caixa",
-        perfilCor: "bg-green-200 text-green-800",
-        status: "Ativo",
-        statusCor: "bg-green-100 text-green-700",
-        ultimoAcesso: "18/11/2025",
-        criadoEm: "29/11/2024"
+        nome: 'Pedro Costa',
+        email: 'caixa@saborrush.com',
+        perfil: 'Caixa',
+        perfilCor: 'bg-green-200 text-green-800',
+        status: 'Ativo',
+        statusCor: 'bg-green-100 text-green-700',
+        ultimoAcesso: '18/11/2025',
+        criadoEm: '29/11/2024',
     },
     {
-        nome: "Ana Oliveira",
-        email: "ana.garcom@saborrush.com",
-        perfil: "Garçom/Vendas",
-        perfilCor: "bg-blue-200 text-blue-800",
-        status: "Inativo",
-        statusCor: "bg-red-100 text-red-700",
-        ultimoAcesso: "14/10/2024",
-        criadoEm: "09/11/2024"
-    }
+        nome: 'Ana Oliveira',
+        email: 'ana.garcom@saborrush.com',
+        perfil: 'Garçom/Vendas',
+        perfilCor: 'bg-blue-200 text-blue-800',
+        status: 'Inativo',
+        statusCor: 'bg-red-100 text-red-700',
+        ultimoAcesso: '14/10/2024',
+        criadoEm: '09/11/2024',
+    },
 ]
 
 export default function GerenciaUsuariosPage() {
     const router = useRouter()
+    const [busca, setBusca] = useState('')
+    const [modalAberto, setModalAberto] = useState(false)
+    const [usuarioSelecionado, setUsuarioSelecionado] = useState<Usuario | null>(null)
 
-    // Exemplo de valores fixos, pode vir de props ou API depois
-    const total = 5
-    const ativos = 5
-    const inativos = 5
-    const admins = 5
-    const garcons = 5
-    const cozinha = 5
-    const caixa = 5
 
-    // Estado da busca
-    const [busca, setBusca] = useState("")
-
-    // Filtra usuários pelo nome ou email conforme busca
-    const usuariosFiltrados = usuariosMock.filter(user =>
-        user.nome.toLowerCase().includes(busca.toLowerCase()) ||
-        user.email.toLowerCase().includes(busca.toLowerCase())
+    const usuariosFiltrados = usuariosMock.filter(
+        (user) =>
+            user.nome.toLowerCase().includes(busca.toLowerCase()) ||
+            user.email.toLowerCase().includes(busca.toLowerCase())
     )
 
     return (
         <div className="min-h-screen bg-gray-100">
-
+            
             {/* HEADER */}
             <header className="bg-white border-b px-6 py-4">
                 <div className="flex items-center justify-between">
@@ -121,7 +130,7 @@ export default function GerenciaUsuariosPage() {
                     </div>
 
                     <div className="text-right">
-                        <p className="text-sm font-medium">Fulan de Tal</p>
+                        <p className="text-sm font-medium">Fulano de Tal</p>
                         <p className="text-xs text-gray-500">Admin</p>
                     </div>
                 </div>
@@ -129,16 +138,16 @@ export default function GerenciaUsuariosPage() {
 
             {/* CARDS */}
             <section className="px-6 py-6 grid grid-cols-7 gap-4">
-                <StatusCard label="Total" count={total} />
-                <StatusCard label="Ativos" count={ativos} colorClass="bg-green-100 text-green-700 border-green-300" />
-                <StatusCard label="Inativos" count={inativos} colorClass="bg-red-100 text-red-700 border-red-300" />
-                <StatusCard label="Admins" count={admins} colorClass="bg-purple-100 text-purple-700 border-purple-300" />
-                <StatusCard label="Garçons" count={garcons} colorClass="bg-blue-100 text-blue-700 border-blue-300" />
-                <StatusCard label="Cozinha" count={cozinha} colorClass="bg-orange-100 text-orange-700 border-orange-300" />
-                <StatusCard label="Caixa" count={caixa} colorClass="bg-green-100 text-green-700 border-green-300" />
+                <StatusCard label="Total" count={5} />
+                <StatusCard label="Ativos" count={4} colorClass="bg-green-100 text-green-700 border-green-300" />
+                <StatusCard label="Inativos" count={1} colorClass="bg-red-100 text-red-700 border-red-300" />
+                <StatusCard label="Admins" count={1} colorClass="bg-purple-100 text-purple-700 border-purple-300" />
+                <StatusCard label="Garçons" count={2} colorClass="bg-blue-100 text-blue-700 border-blue-300" />
+                <StatusCard label="Cozinha" count={1} colorClass="bg-orange-100 text-orange-700 border-orange-300" />
+                <StatusCard label="Caixa" count={1} colorClass="bg-green-100 text-green-700 border-green-300" />
             </section>
 
-            {/* LISTA DE USUÁRIOS */}
+            {/* LISTA */}
             <section className="px-6 pb-6">
                 <div className="flex flex-wrap justify-between items-center mb-4 gap-4">
                     <input
@@ -146,59 +155,84 @@ export default function GerenciaUsuariosPage() {
                         placeholder="Buscar por nome ou email..."
                         value={busca}
                         onChange={(e) => setBusca(e.target.value)}
-                        className="flex-grow min-w-[250px] max-w-sm border rounded-md px-3 py-2 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        className="flex-grow min-w-[250px] max-w-sm border rounded-md px-3 py-2 text-sm"
                     />
                     <button
-                        onClick={() => alert('Adicionar novo usuário')}
-                        className="bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-600 transition"
+                        onClick={() => {
+                            setUsuarioSelecionado(null)
+                            setModalAberto(true)
+                        }}
+                        className="bg-purple-500 text-white px-4 py-2 rounded-md hover:bg-purple-600"
                     >
                         + Novo Usuário
                     </button>
+
+
                 </div>
 
                 <div className="overflow-y-auto max-h-[400px] border rounded-md bg-white">
                     <table className="w-full text-left text-sm border-collapse">
                         <thead className="bg-gray-50 sticky top-0 z-10">
                             <tr>
-                                {["Nome", "E-mail", "Perfil", "Status", "Último Acesso", "Criado em", "Ações"].map((header) => (
-                                    <th key={header} className="py-3 px-4 border-b border-gray-200 font-semibold text-gray-700">{header}</th>
-                                ))}
+                                {['Nome', 'E-mail', 'Perfil', 'Status', 'Último Acesso', 'Criado em', 'Ações'].map(
+                                    (h) => (
+                                        <th
+                                            key={h}
+                                            className="py-3 px-4 border-b border-gray-200 font-semibold text-gray-700"
+                                        >
+                                            {h}
+                                        </th>
+                                    )
+                                )}
                             </tr>
                         </thead>
+
                         <tbody>
-                            {usuariosFiltrados.length === 0 && (
-                                <tr>
-                                    <td colSpan={7} className="text-center py-6 text-gray-500">
-                                        Nenhum usuário encontrado.
-                                    </td>
-                                </tr>
-                            )}
                             {usuariosFiltrados.map((user, idx) => (
-                                <tr key={idx} className="even:bg-gray-50 text-gray-500">
-                                    <td className="py-3 px-4 border-b">{user.nome}</td>
-                                    <td className="py-3 px-4 border-b">{user.email}</td>
-                                    <td className={`py-3 px-4 border-b rounded-md max-w-[150px] text-center ${user.perfilCor}`}>
-                                        {user.perfil}
+                                <tr key={idx} className="even:bg-gray-50">
+                                    <td className="py-3 px-4 text-gray-500 border-b">{user.nome}</td>
+                                    <td className="py-3 px-4 text-gray-500 border-b w-[20%] max-w-[220px] truncate">
+                                        {user.email}
                                     </td>
-                                    <td className={`py-3 px-4 border-b rounded-md max-w-[100px] text-center flex items-center justify-center gap-1 ${user.statusCor}`}>
-                                        {user.status === "Ativo" ? (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        ) : (
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        )}
-                                        <span>{user.status}</span>
+
+
+                                    {/* PERFIL */}
+                                    <td className="py-3 px-4 text-gray-500 border-b text-left">
+                                        <div
+                                            className={`inline-block  px-3 py-1 text-gray-500 rounded-md text-xs font-medium ${user.perfilCor}`}
+                                        >
+                                            {user.perfil}
+                                        </div>
                                     </td>
-                                    <td className="py-3 px-4 border-b">{user.ultimoAcesso}</td>
-                                    <td className="py-3 px-4 border-b">{user.criadoEm}</td>
-                                    <td className="py-3 px-4 border-b flex items-center gap-2 text-gray-600">
-                                        <button title="Visualizar" className="hover:text-gray-900"><Eye size={16} /></button>
-                                        <button title="Editar" className="hover:text-gray-900"><Edit size={16} /></button>
-                                        <button title="Resetar senha" className="hover:text-gray-900"><RefreshCcw size={16} /></button>
-                                        <button title="Excluir" className="hover:text-red-600"><Trash2 size={16} /></button>
+
+                                    {/* STATUS */}
+                                    <td className="py-3 px-4 text-gray-500 border-b text-left">
+                                        <div
+                                            className={`inline-flex items-center gap-1 px-3 py-1  rounded-md text-xs font-medium ${user.statusCor}`}
+                                        >
+                                            {user.status === 'Ativo' ? '✓' : '✕'}
+                                            <span>{user.status}</span>
+                                        </div>
+                                    </td>
+
+                                    <td className="py-3 px-4 text-gray-500 border-b">{user.ultimoAcesso}</td>
+                                    <td className="py-3 px-4 text-gray-500 border-b">{user.criadoEm}</td>
+
+                                    {/* AÇÕES */}
+                                    <td className="py-3 px-4 text-gray-500 border-b">
+                                        <div className="flex items-center text-gray-500 gap-2 text-gray-600">
+                                            <button
+                                                title="Visualizar"
+                                                onClick={() => {
+                                                    setUsuarioSelecionado(user)
+                                                    setModalAberto(true)
+                                                }}
+                                                className="hover:text-gray-900"
+                                            >
+                                                <Edit size={16} />
+                                            </button>                                           
+                                            <button className="text-red-600"><Trash2 size={16} /></button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -206,6 +240,109 @@ export default function GerenciaUsuariosPage() {
                     </table>
                 </div>
             </section>
+
+            {modalAberto && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    {/* Overlay */}
+                    <div
+                        className="absolute inset-0 bg-black/40"
+                        onClick={() => setModalAberto(false)}
+                    />
+
+                    {/* Modal */}
+                    <div className="relative bg-white w-full max-w-lg rounded-xl shadow-lg p-6 z-10">
+
+                        {/* Header */}
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <h2 className="text-lg font-semibold text-gray-800">
+                                    {usuarioSelecionado ? 'Visualizar Usuário' : 'Novo Usuário'}
+                                </h2>
+                                <p className="text-sm text-gray-500">
+                                    Preencha os dados para criar um novo usuário
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setModalAberto(false)}
+                                className="text-gray-400 hover:text-gray-600"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Form */}
+                        <form className="space-y-4">
+                            <div>
+                                <label className="text-sm text-gray-500 font-medium">Nome Completo *</label>
+                                <input
+                                    type="text"
+                                    defaultValue={usuarioSelecionado?.nome || ''}
+                                    className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-sm text-gray-500 font-medium">E-mail *</label>
+                                <input
+                                    type="email"
+                                    defaultValue={usuarioSelecionado?.email || ''}
+                                    className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="text-sm text-gray-500 font-medium">Perfil de Acesso *</label>
+                                <select
+                                    defaultValue={usuarioSelecionado?.perfil || ''}
+                                    className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
+                                >
+                                    <option value="">Selecione</option>
+                                    <option value="Administrador">Administrador</option>
+                                    <option value="Garçom/Vendas">Garçom/Vendas</option>
+                                    <option value="Cozinha">Cozinha</option>
+                                    <option value="Caixa">Caixa</option>
+                                </select>
+                            </div>
+
+                            {!usuarioSelecionado && (
+                                <div>
+                                    <label className="text-sm font-medium">Senha *</label>
+                                    <input
+                                        type="password"
+                                        className="w-full mt-1 px-3 py-2 border rounded-md text-sm"
+                                        placeholder="******"
+                                    />
+                                </div>
+                            )}
+
+                            <div className="text-xs text-gray-500 border rounded-md px-3 py-2">
+                                O usuário receberá um e-mail com instruções de acesso.
+                            </div>
+
+                            {/* Actions */}
+                            <div className="flex justify-end gap-2 pt-4">
+                                <button
+                                    type="button"
+                                    onClick={() => setModalAberto(false)}
+                                    className="px-4 py-2 text-sm border rounded-md"
+                                >
+                                    Fechar
+                                </button>
+
+                                {!usuarioSelecionado && (
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 text-sm bg-purple-500 text-white rounded-md"
+                                    >
+                                        Criar Usuário
+                                    </button>
+                                )}
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
 
         </div>
     )
