@@ -57,6 +57,10 @@ async function main() {
       { nome: 'Coca-Cola Lata', preco: 6.0, categoria: 'Bebidas', temEstoqueControlado: true, quantidadeEstoque: 100, minimoEstoque: 10 },
       { nome: 'Suco Natural', preco: 8.0, categoria: 'Bebidas', temEstoqueControlado: false },
       { nome: 'Pizza Média', preco: 40.0, categoria: 'Pizzas', temEstoqueControlado: false },
+      { nome: 'Batata Frita', preco: 15.0, categoria: 'Acompanhamentos', temEstoqueControlado: false },
+      { nome: 'Salada Caesar', preco: 18.0, categoria: 'Saladas', temEstoqueControlado: false },
+      { nome: 'Água Mineral', preco: 4.0, categoria: 'Bebidas', temEstoqueControlado: true, quantidadeEstoque: 200, minimoEstoque: 20 },
+      
     ]
   })
 

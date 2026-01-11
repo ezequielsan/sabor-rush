@@ -116,38 +116,46 @@ export async function unirMesas(idMesaOrigem: string, idMesaDestino: string) {
   }
 }
 
-// ... (mantenha os imports e funções anteriores)
 
+
+// --- READ: Buscar Dados do Dashboard ---
 export async function buscarDadosDashboard() {
   try {
-    // Busca mesas e inclui os pedidos que NÃO estão finalizados
     const mesas = await prisma.mesa.findMany({
-      orderBy: { numero: 'asc' }, 
+      orderBy: { numero: 'asc' },
       include: {
         pedidos: {
-          where: {
-            status: { not: 'FINALIZADO' }
-          },
-          include: {
-            itens: true
-          }
+          where: { status: { notIn: ['FINALIZADO', 'CANCELADO'] } }, // Filtra apenas pedidos ativos
+          include: { itens: true }
         }
       }
     })
 
-    // Processa os dados
     const mesasFormatadas = mesas.map((mesa: any) => {
-      const pedidoAtual = mesa.pedidos[0]
+      const pedidosAtivos = mesa.pedidos
       
       let total = 0
-      let itensCount = 0
+      let qtdPedidos = 0
       let tempo = 'Livre'
+      let temPedidoPronto = false 
+      let pedidosNaoEntregues = 0 // <--- NOVO CAMPO
 
-      if (pedidoAtual) {
-        total = pedidoAtual.totalFinal
-        itensCount = pedidoAtual.itens.length
+      if (pedidosAtivos.length > 0) {
+        total = pedidosAtivos.reduce((acc: number, pedido: any) => acc + Number(pedido.totalFinal), 0)
+        qtdPedidos = pedidosAtivos.length
         
-        const diffMs = new Date().getTime() - new Date(pedidoAtual.dataCriacao).getTime()
+        // Verifica se tem pedido pronto (para o sino verde)
+        temPedidoPronto = pedidosAtivos.some((p: any) => p.status === 'PRONTO')
+        
+        // CONTAGEM DE PENDÊNCIAS: Quantos não estão 'ENTREGUE'?
+        pedidosNaoEntregues = pedidosAtivos.filter((p: any) => p.status !== 'ENTREGUE').length
+
+        // Cálculo do tempo
+        const pedidoMaisAntigo = pedidosAtivos.sort((a: any, b: any) => 
+            new Date(a.dataCriacao).getTime() - new Date(b.dataCriacao).getTime()
+        )[0]
+
+        const diffMs = new Date().getTime() - new Date(pedidoMaisAntigo.dataCriacao).getTime()
         const diffMins = Math.floor(diffMs / 60000)
         
         if (diffMins > 60) {
@@ -161,38 +169,80 @@ export async function buscarDadosDashboard() {
 
       return {
         id: mesa.id,
-        codigo: mesa.numero, 
+        codigo: mesa.numero,
         status: mesa.status,
-        nome: `Mesa ${mesa.numero}`, 
+        nome: `Mesa ${mesa.numero}`,
         total,
-        itensCount,
-        tempo
+        qtdPedidos,
+        tempo,
+        temPedidoPronto,
+        pedidosNaoEntregues // <--- Enviamos para o front
       }
     })
 
-    // Cálculos dos Cards
+    // Resumos
     const totalMesas = mesas.length
-    const ocupadas = mesas.filter(m => m.status === 'OCUPADA').length
+    const ocupadas = mesas.filter(m => m.status === 'OCUPADA' || m.status === 'AGUARDANDO').length
     const livres = mesas.filter(m => m.status === 'LIVRE').length
-    
-    // Soma o total
     const faturamentoAberto = mesasFormatadas.reduce((acc: number, curr: any) => acc + curr.total, 0)
 
     return {
       sucesso: true,
       dados: {
         mesas: mesasFormatadas,
-        resumo: {
-          totalMesas,
-          ocupadas,
-          livres,
-          faturamentoAberto
-        }
+        resumo: { totalMesas, ocupadas, livres, faturamentoAberto }
       }
     }
 
   } catch (error) {
     console.error(error)
     return { sucesso: false, erro: "Erro ao carregar dashboard" }
+  }
+}
+
+// --- UPDATE: Fechar Conta (Pagamento) ---
+export async function fecharConta(mesaId: string, metodoPagamento: string) {
+  try {
+    await prisma.$transaction(async (tx) => {
+      
+      // 1. Busca TODOS os pedidos ativos (não finalizados/cancelados)
+      const pedidosAtivos = await tx.pedido.findMany({
+        where: { 
+          mesaId: mesaId, 
+          status: { notIn: ['FINALIZADO', 'CANCELADO'] } 
+        }
+      })
+
+      if (pedidosAtivos.length === 0) {
+        throw new Error("Não há pedidos para fechar nesta mesa.")
+      }
+
+      // --- NOVA VALIDAÇÃO DE SEGURANÇA ---
+      // Filtra pedidos que ainda não foram entregues ao cliente
+      const pedidosPendentes = pedidosAtivos.filter(p => p.status !== 'ENTREGUE')
+
+      if (pedidosPendentes.length > 0) {
+        // Se quiser ser mais específico, pode dizer quantos faltam
+        throw new Error(`Não é possível fechar: Existem ${pedidosPendentes.length} pedidos não entregues (Cozinha).`)
+      }
+      // ------------------------------------
+
+      // 2. Finaliza todos os pedidos da mesa
+      await tx.pedido.updateMany({
+        where: { mesaId: mesaId, status: { not: 'FINALIZADO' } },
+        data: { status: 'FINALIZADO' }
+      })
+
+      // 3. Libera a mesa imediatamente
+      await tx.mesa.update({
+        where: { id: mesaId },
+        data: { status: 'LIVRE' }
+      })
+    })
+
+    return { sucesso: true }
+  } catch (erro: any) {
+    console.error("Erro ao fechar conta:", erro)
+    return { sucesso: false, erro: erro.message || "Erro ao processar fechamento" }
   }
 }

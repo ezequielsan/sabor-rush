@@ -89,6 +89,7 @@ enum StatusMesa {
   LIVRE
   OCUPADA
   PAGAMENTO_PENDENTE
+  AGUARDANDO
 }
 
 // 5. CUPONS [RF15]
