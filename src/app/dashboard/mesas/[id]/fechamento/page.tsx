@@ -20,13 +20,11 @@ export default async function FechamentoPage({ params }: FechamentoPageProps) {
     }
   })
 
-  // Se a mesa não existe ou está livre, volta pro dashboard
   if (!mesa || mesa.status === 'LIVRE') {
     redirect('/dashboard')
   }
 
   // 2. Processa os dados para o Resumo
-  // Agrupa itens iguais (ex: 2 pedidos de Coca-cola viram 1 item com qtd 2)
   const itensMap = new Map<string, { nome: string; quantidade: number; total: number }>()
   
   let subtotalGeral = 0
@@ -34,9 +32,7 @@ export default async function FechamentoPage({ params }: FechamentoPageProps) {
   mesa.pedidos.forEach(pedido => {
     pedido.itens.forEach(item => {
       const nome = item.produto.nome
-      // --- CORREÇÃO AQUI ---
-      // Usamos 'precoNaHora' (nome do banco) e garantimos que é Number
-      // Caso seja null (pedidos antigos), usamos o preço atual do produto
+      
       const precoReal = item.precoNaHora ? Number(item.precoNaHora) : Number(item.produto.preco)
       
       const totalItem = precoReal * item.quantidade

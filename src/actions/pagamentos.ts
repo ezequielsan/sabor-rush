@@ -25,8 +25,6 @@ export async function registrarPagamento(pedidoId: string, metodo: 'DINHEIRO' | 
         where: { id: pedidoId },
         data: { status: 'FINALIZADO' }
       })
-
-      // Libera a mesa automaticamente (Conforme Diagrama de Atividade 2)
       await tx.mesa.update({
         where: { id: pedido.mesaId },
         data: { status: 'LIVRE' }

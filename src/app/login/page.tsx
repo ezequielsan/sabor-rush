@@ -3,12 +3,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { User, Eye, EyeOff, Lock, Mail } from 'lucide-react'
-import { realizarLogin } from '@/actions/auth' // Importamos a action que criamos no Backend
+import { realizarLogin } from '@/actions/auth' 
 
 export default function LoginPage() {
   const router = useRouter()
   
-  // Estados para controlar o formulário
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [mostrarSenha, setMostrarSenha] = useState(false)
@@ -16,7 +15,6 @@ export default function LoginPage() {
   const [erro, setErro] = useState('')
   const [loading, setLoading] = useState(false)
 
-  // Lista de perfis conforme a imagem (Apenas visual, pois o banco define o perfil real)
   const perfis = [
     { id: 'ADMIN', label: 'Administrador' },
     { id: 'CAIXA', label: 'Caixa' },
@@ -28,7 +26,6 @@ export default function LoginPage() {
     e.preventDefault()
     setErro('')
     
-    // [NOVO] Validação visual antes de chamar o servidor
     if (!perfilSelecionado) {
       setErro("Por favor, selecione seu perfil (Admin, Garçom, etc).")
       return
@@ -37,11 +34,9 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // Chamada ao Backend
       const resultado = await realizarLogin(email, senha, perfilSelecionado)
 
       if (resultado.sucesso) {
-        // --- ROTEAMENTO INTELIGENTE POR PERFIL ---
         const perfil = resultado.usuario?.perfil
 
         if (perfil === 'CAIXA') {
@@ -51,7 +46,6 @@ export default function LoginPage() {
           router.push('/dashboard/cozinha')
         } 
         else {
-          // ADMIN e GARÇOM vão para a visão geral das mesas
           router.push('/dashboard')
         }
 
@@ -121,8 +115,6 @@ export default function LoginPage() {
           </div>
 
           {/* Radio Buttons de Perfil */}
-          {/* Nota: Implementei visualmente para bater com o design, mas a lógica real 
-              de quem é o usuário vem do banco de dados no backend */}
           <div className="flex flex-wrap gap-4 justify-between pt-2">
             {perfis.map((perfil) => (
               <label key={perfil.id} className="flex items-center gap-2 cursor-pointer group">

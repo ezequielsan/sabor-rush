@@ -15,7 +15,6 @@ export async function criarUsuario(nome: string, email: string, senhaPlana: stri
         email,
         senhaHash: senhaPlana, 
         perfil,
-        // ativo: true <--- REMOVIDO POIS NÃO EXISTE NO BANCO AINDA
       }
     })
     revalidatePath('/dashboard/usuarios')
@@ -73,7 +72,7 @@ export async function alternarStatusUsuario(id: string, statusAtual: boolean) {
     // PARA NÃO QUEBRAR A TELA
     return { sucesso: true } 
     
-    /* QUANDO VOCÊ ADICIONAR O CAMPO NO SCHEMA, DESCOMENTE ISSO:
+    /*
     try {
       await prisma.usuario.update({
         where: { id },

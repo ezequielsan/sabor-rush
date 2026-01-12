@@ -86,7 +86,7 @@ export async function buscarPedidosCozinha() {
           include: { produto: true }
         }
       },
-      orderBy: { dataCriacao: 'asc' } // FIFO (Primeiro que entra, primeiro que sai)
+      orderBy: { dataCriacao: 'asc' } 
     })
     return { sucesso: true, dados: pedidos }
   } catch (erro) {

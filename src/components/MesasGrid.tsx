@@ -154,7 +154,6 @@ export function MesasGrid({ mesas }: MesasGridProps) {
               {/* Botão 4: Fechar Conta */}
               <button 
                 onClick={() => handleAcao('fechar')}
-                // --- 3. Bloqueia o clique se tiver pendência OU total zerado ---
                 disabled={mesaSelecionada.pedidosNaoEntregues > 0 || mesaSelecionada.total === 0}
                 className={`
                   w-full flex items-center gap-4 p-4 rounded-xl border transition-all group text-left

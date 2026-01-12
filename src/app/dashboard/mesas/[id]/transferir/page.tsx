@@ -25,19 +25,15 @@ export default async function TransferirPage({ params }: TransferirPageProps) {
     orderBy: { numero: 'asc' }
   })
 
-  // --- CORREÇÃO DO ERRO ---
-  // O componente espera a propriedade 'nome', mas o banco só tem 'numero'.
-  // Vamos criar objetos formatados adicionando o nome manualmente.
-
   const mesaOrigemFormatada = {
     id: mesaOrigem.id,
     numero: mesaOrigem.numero,
-    nome: `Mesa ${mesaOrigem.numero}` // <--- ADICIONAMOS O NOME AQUI
+    nome: `Mesa ${mesaOrigem.numero}` 
   }
 
   const mesasLivresFormatadas = mesasLivresDb.map(m => ({
     ...m,
-    nome: `Mesa ${m.numero}` // <--- E AQUI TAMBÉM
+    nome: `Mesa ${m.numero}` 
   }))
 
   return (

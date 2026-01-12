@@ -8,12 +8,11 @@ import { cookies } from 'next/headers'
 export async function obterDadosFechamento() {
   try {
     const hoje = new Date()
-    hoje.setHours(0, 0, 0, 0) // Início do dia (00:00)
+    hoje.setHours(0, 0, 0, 0) 
     
     const amanha = new Date(hoje)
     amanha.setDate(amanha.getDate() + 1) // Fim do dia
 
-    // 1. Verifica se já houve algum fechamento HOJE
     const ultimoFechamento = await prisma.fechamentoCaixa.findFirst({
       where: {
         dataFechamento: {
@@ -26,8 +25,7 @@ export async function obterDadosFechamento() {
       }
     })
 
-    // 2. Define o ponto de partida (Início do Turno)
-    // Se teve fechamento, começamos a contar a partir dele. Se não, desde as 00:00.
+    
     const inicioTurno = ultimoFechamento ? ultimoFechamento.dataFechamento : hoje
 
     // 3. Busca apenas os pedidos deste turno atual
@@ -35,16 +33,14 @@ export async function obterDadosFechamento() {
       where: {
         status: 'FINALIZADO',
         dataCriacao: {
-          gte: inicioTurno, // <--- O PULO DO GATO ESTÁ AQUI
+          gte: inicioTurno, 
           lt: amanha
         }
       }
     })
 
     const totalVendas = pedidos.reduce((acc, p) => acc + Number(p.totalFinal), 0)
-    
-    // MOCK: Distribuição simulada (Ajuste conforme sua necessidade)
-    const esperado = {
+        const esperado = {
       DINHEIRO: totalVendas * 0.2,
       CREDITO: totalVendas * 0.4, 
       DEBITO: totalVendas * 0.3,   
@@ -56,7 +52,7 @@ export async function obterDadosFechamento() {
       ticketMedio: pedidos.length > 0 ? totalVendas / pedidos.length : 0,
       totalLiquido: totalVendas, 
       totalDescontos: 0,
-      inicioTurno: inicioTurno // Opcional: útil se quiser mostrar na tela "Aberto às X horas"
+      inicioTurno: inicioTurno 
     }
 
     return { 
@@ -87,7 +83,6 @@ export async function confirmarFechamentoCaixa(payload: {
 
     if (!usuarioId) return { sucesso: false, erro: "ID do usuário não encontrado." }
 
-    // Recalcula totais para segurança
     const totalEsperado = Object.values(payload.esperado).reduce((acc: number, val: any) => acc + Number(val), 0)
 
     const totalReal = Object.values(payload.informado).reduce((acc: number, val: any) => {
@@ -100,7 +95,6 @@ export async function confirmarFechamentoCaixa(payload: {
 
     const diferenca = totalReal - totalEsperado
 
-    // Salva no banco
     await prisma.fechamentoCaixa.create({
       data: {
         valorTotalEsperado: totalEsperado,
@@ -111,7 +105,6 @@ export async function confirmarFechamentoCaixa(payload: {
       }
     })
     
-    // Atualiza a cache para que a próxima consulta já venha zerada
     revalidatePath('/dashboard/caixa/fechamento')
 
     return { sucesso: true }

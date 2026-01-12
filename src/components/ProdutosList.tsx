@@ -5,10 +5,8 @@ import {
   Search, Plus, Edit3, Trash2, X, CheckCircle, XCircle, Loader2, Package, AlertTriangle
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-// Importamos as funções do seu arquivo atualizado
 import { salvarProduto, atualizarProdutoCompleto, excluirProduto, alternarStatusProduto } from '@/actions/produtos'
 
-// Formatação de Moeda
 const formatarMoeda = (val: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val)
 
 interface Produto {
@@ -60,8 +58,6 @@ export default function ProdutosList({ produtosIniciais }: ProdutosListProps) {
     sobremesas: produtos.filter(p => p.categoria === 'SOBREMESAS').length,
   }
 
-  // --- AÇÕES ---
-
   const handleAbrirModal = (produto?: Produto) => {
     if (produto) {
       setProdutoEditando(produto)
@@ -89,7 +85,6 @@ export default function ProdutosList({ produtosIniciais }: ProdutosListProps) {
       // Editar existente
       res = await atualizarProdutoCompleto(produtoEditando.id, formData)
     } else {
-      // Criar Novo (Adaptando para sua função salvarProduto)
       res = await salvarProduto({
         nome: formData.nome,
         preco: parseFloat(formData.preco),
@@ -101,7 +96,6 @@ export default function ProdutosList({ produtosIniciais }: ProdutosListProps) {
 
     if (res.sucesso) {
       setModalAberto(false)
-      // Não precisa forçar reload manual se usar revalidatePath no server
     } else {
       alert(res.erro)
     }

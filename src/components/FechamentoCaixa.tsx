@@ -100,7 +100,7 @@ export default function FechamentoCaixa({ dadosIniciais }: FechamentoProps) {
             { text: `Gerado em: ${dataHora}`, style: 'subheader' },
             { text: `Responsável: Admin`, style: 'subheader', margin: [0, 0, 0, 20] },
 
-            // Resumo KPI
+            
             {
                 table: {
                     widths: ['*', '*', '*'],

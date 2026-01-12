@@ -17,12 +17,10 @@ export async function cadastrarCliente(nome: string, telefone: string) {
   }
 }
 
-// Buscar cliente pelo telefone (para associar ao pedido)
 export async function buscarClientePorTelefone(telefone: string) {
   return await prisma.cliente.findUnique({ where: { telefone } })
 }
 
-// [RF08] Histórico de Pedidos
 export async function obterHistoricoCliente(clienteId: string) {
   try {
     const pedidos = await prisma.pedido.findMany({

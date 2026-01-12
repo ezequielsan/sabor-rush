@@ -13,10 +13,6 @@ export default async function DashboardPage() {
   const resumo = dados?.resumo || { totalMesas: 0, ocupadas: 0, livres: 0, faturamentoAberto: 0 }
 
   return (
-    // FIX DE ROLAGEM AQUI:
-    // 1. h-full: Ocupa toda a altura disponível
-    // 2. overflow-y-auto: Cria a barra de rolagem SÓ AQUI dentro, se precisar
-    // 3. pr-2: Um pequeno espaço na direita para a barra de rolagem não colar no conteúdo
     <div className="flex flex-col h-full overflow-y-auto pr-2"> 
       
       {/* --- HEADER --- */}

@@ -55,7 +55,6 @@ export default function PedidoForm({ mesaId, produtos, categorias }: PedidoFormP
   // --- HELPER DE NOTIFICAÇÃO ---
   const showToast = (msg: string, type: 'success' | 'error') => {
     setToast({ show: true, msg, type })
-    // Some após 3 segundos se for erro, ou espera o redirect se for sucesso
     if (type === 'error') {
       setTimeout(() => setToast({ ...toast, show: false }), 4000)
     }
@@ -165,7 +164,6 @@ export default function PedidoForm({ mesaId, produtos, categorias }: PedidoFormP
         const resultado = await criarPedido(mesaId, itensParaEnviar)
 
         if (resultado.sucesso) {
-            // SUCESSO: Mostra toast verde e redireciona após 1.5s
             showToast('Pedido enviado para a cozinha com sucesso!', 'success')
             
             setTimeout(() => {
@@ -174,7 +172,6 @@ export default function PedidoForm({ mesaId, produtos, categorias }: PedidoFormP
             }, 1500)
             
         } else {
-            // ERRO: Mostra toast vermelho e PARA (loading false)
             showToast(resultado.erro || 'Erro ao criar pedido.', 'error')
             setLoading(false)
         }

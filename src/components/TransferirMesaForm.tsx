@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowRightLeft, CheckCircle, ChevronLeft, Loader2, XCircle } from 'lucide-react'
-// IMPORTANTE: Ajuste o caminho abaixo se seu arquivo for 'mesa.ts' ou 'mesas.ts'
 import { transferirMesa } from '@/actions/mesas' 
 
 interface TransferirMesaFormProps {
@@ -21,7 +20,6 @@ export default function TransferirMesaForm({ mesaOrigem, mesasLivres }: Transfer
     if (!selecionada) return
     setLoading(true)
 
-    // Chama a SUA função existente no backend
     const resp = await transferirMesa(mesaOrigem.id, selecionada)
 
     if (resp.sucesso) {

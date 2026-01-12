@@ -10,8 +10,6 @@ export default async function DashboardLayout({
   const cookieStore = await cookies()
   const session = cookieStore.get('sabor-session')?.value
 
-  // Se não tiver sessão no layout, o middleware já deve ter barrado,
-  // mas por segurança redirecionamos aqui também.
   if (!session) {
     redirect('/')
   }

@@ -8,7 +8,6 @@ export default async function CozinhaPage() {
   const pedidos = resultado.sucesso ? resultado.dados : []
 
   return (
-    // h-full é crucial aqui para herdar o h-screen do layout
     <div className="flex h-full flex-col"> 
       
       <header className="mb-4 flex flex-shrink-0 items-center justify-between">

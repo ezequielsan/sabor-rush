@@ -23,7 +23,6 @@ interface UsuariosListProps {
 
 export default function UsuariosList({ usuariosIniciais }: UsuariosListProps) {
   const router = useRouter()
-  // Mock visual para 'ativo' caso não venha do banco
   const usuarios = usuariosIniciais.map(u => ({ ...u, ativo: u.ativo ?? true }))
   
   const [busca, setBusca] = useState('')

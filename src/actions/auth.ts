@@ -3,10 +3,8 @@
 import { prisma } from '@/lib/prisma'
 import { cookies } from 'next/headers'
 
-// Agora a função aceita o 3º argumento: perfilSelecionado
 export async function realizarLogin(email: string, senhaPlana: string, perfilSelecionado: string) {
   try {
-    // 1. Verifica se foi enviado um perfil
     if (!perfilSelecionado) {
       return { sucesso: false, erro: "Selecione um perfil de acesso." }
     }
@@ -15,8 +13,6 @@ export async function realizarLogin(email: string, senhaPlana: string, perfilSel
     
     if (!usuario) return { sucesso: false, erro: "Usuário não encontrado." }
     
-    // 2. [NOVO] Validação de Perfil
-    // Verifica se o perfil escolhido no botão bate com o do banco
     if (usuario.perfil !== perfilSelecionado) {
       return { 
         sucesso: false, 
@@ -24,12 +20,10 @@ export async function realizarLogin(email: string, senhaPlana: string, perfilSel
       }
     }
 
-    // 3. Validação de senha (MVP)
     if (usuario.senhaHash !== senhaPlana) {
       return { sucesso: false, erro: "Senha incorreta." }
     }
 
-    // --- CRIAÇÃO DA SESSÃO ---
     const dadosSessao = JSON.stringify({
       id: usuario.id,
       nome: usuario.nome,
@@ -41,7 +35,7 @@ export async function realizarLogin(email: string, senhaPlana: string, perfilSel
     cookieStore.set('sabor-session', dadosSessao, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24, // 1 dia
+      maxAge: 60 * 60 * 24, 
       path: '/'
     })
 
