@@ -1,7 +1,11 @@
 This is a Next.js project bootstrapped with create-next-app.
 
 🚀 Deploy
-O projeto pode ser acessado online através do link: https://sabor-rush.vercel.app/dashboard/usuarios
+O projeto pode ser acessado online através do link: https://sabor-rush.vercel.app/login
+
+Usuário teste:
+Email: admin@sabor.com
+senha: admin
 
 🔗 Links do Projeto
 Requisitos: Google Docs
