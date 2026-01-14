@@ -4,11 +4,16 @@ Sabor Rush é uma aplicação desenvolvida com Next.js para gerenciar pedidos, m
 
 🚀 **Deploy**
 O projeto pode ser acessado online através do link: [Sabor Rush](https://sabor-rush.vercel.app/login)
+- Use as seguintes credenciais para login:
+    - email: admin@sabor.com
+    - senha: admin
+    - perfil: Administrador
 
 🔗 **Links do Projeto**
-- **Repositório GitHub:** [Sabor Rush Repository](https://github.com/usuario/sabor-rush)
+- **Repositório GitHub:** [Sabor Rush Repository](https://github.com/ezequielsan/sabor-rush)
 - **Protótipo Figma:** [Figma Design](https://www.figma.com/design/ZPODNGpZbAcadTX4U2g5tK/Sabor-Rush?node-id=0-1&t=GrNz3XI0bUZWE3oV-1)
 - **Planilha de Testes:** [Google Sheets](https://docs.google.com/spreadsheets/d/1xMgl17_W8dkebh_ljqhHTZEr1EgUL5N-rnBPJCJrPk8/edit?usp=sharing)
+- **Slides da Apresentação**[Slides](https://www.canva.com/design/DAG-VbP4J7I/O6c_pjFyJdS8k_vy0zMiSQ/edit?utm_content=DAG-VbP4J7I&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 ## Getting Started
 
