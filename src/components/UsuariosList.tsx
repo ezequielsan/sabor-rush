@@ -125,7 +125,7 @@ export default function UsuariosList({ usuariosIniciais }: UsuariosListProps) {
            <p className="text-gray-500 text-sm">Controle de Acesso e Permissões (ACL)</p>
         </div>
         <div className="text-right hidden md:block">
-           <p className="font-bold text-gray-900">Fulano de tal</p>
+           <p className="font-bold text-gray-900">Gerente Admin</p>
            <p className="text-xs text-gray-500">Admin</p>
         </div>
       </div>
