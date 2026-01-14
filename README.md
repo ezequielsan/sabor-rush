@@ -1,47 +1,38 @@
-This is a Next.js project bootstrapped with create-next-app.
+# Sabor Rush
 
-🚀 Deploy
-O projeto pode ser acessado online através do link: https://sabor-rush.vercel.app/login
+Sabor Rush é uma aplicação desenvolvida com Next.js para gerenciar pedidos, mesas, produtos e usuários de um restaurante. O objetivo é oferecer uma interface intuitiva e eficiente para facilitar a operação diária do estabelecimento.
 
-Usuário teste:
-Email: admin@sabor.com
-senha: admin
+🚀 **Deploy**
+O projeto pode ser acessado online através do link: [Sabor Rush](https://sabor-rush.vercel.app/login)
 
-🔗 Links do Projeto
-Requisitos: Google Docs
+🔗 **Links do Projeto**
+- **Repositório GitHub:** [Sabor Rush Repository](https://github.com/usuario/sabor-rush)
+- **Protótipo Figma:** [Figma Design](https://www.figma.com/design/ZPODNGpZbAcadTX4U2g5tK/Sabor-Rush?node-id=0-1&t=GrNz3XI0bUZWE3oV-1)
+- **Planilha de Testes:** [Google Sheets](https://docs.google.com/spreadsheets/d/1xMgl17_W8dkebh_ljqhHTZEr1EgUL5N-rnBPJCJrPk8/edit?usp=sharing)
 
-Protótipo Figma: Figma Design
+## Getting Started
 
-Planilha de Testes: Google Sheets
+Primeiro, execute o servidor de desenvolvimento:
 
-Getting Started
-First, run the development server:
-
-Bash
-
+```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
+# ou
 bun dev
-Open http://localhost:3000 with your browser to see the result.
+```
 
-You can start editing the page by modifying app/page.tsx. The page auto-updates as you edit the file.
+Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
 
-This project uses next/font to automatically optimize and load Geist, a new font family for Vercel.
+Você pode começar a editar a página modificando `app/page.tsx`. A página é atualizada automaticamente conforme você edita o arquivo.
 
-Learn More
-To learn more about Next.js, take a look at the following resources:
+Este projeto utiliza `next/font` para otimizar e carregar automaticamente a fonte Geist, uma nova família de fontes da Vercel.
 
-Next.js Documentation - learn about Next.js features and API.
+## Learn More
 
-Learn Next.js - an interactive Next.js tutorial.
+Para saber mais sobre Next.js, confira os seguintes recursos:
 
-You can check out the Next.js GitHub repository - your feedback and contributions are welcome!
-
-Deploy on Vercel
-The easiest way to deploy your Next.js app is to use the Vercel Platform from the creators of Next.js.
-
-Check out our Next.js deployment documentation for more details.
+- [Next.js Documentation](https://nextjs.org/docs) - Saiba mais sobre as funcionalidades e API do Next.js.
+- [Learn Next.js](https://nextjs.org/learn) - Um tutorial interativo sobre Next.js.
